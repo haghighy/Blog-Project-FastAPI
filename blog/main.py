@@ -34,3 +34,15 @@ def show(id, responce:Response, db:Session=Depends(get_db)):
         # return {'detail': f"Blog with the id {id} ins not available!"}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Blog with the id {id} ins not available!")
     return blog
+
+@app.delete('/blog/{id}', status_code=status.HTTP_204_NO_CONTENT)
+def destroy(id, db:Session=Depends(get_db)):
+    db.query(models.Blog).filter(models.Blog.id==id).delete(synchronize_session=False)
+    db.commit()
+    return 'done'
+
+@app.put('/blog/{id}', status_code=status.HTTP_202_ACCEPTED)
+def update(id, request:schemas.Blog, db:Session=Depends(get_db)):
+    db.query(models.Blog).filter(models.Blog.id==id).update(request.dict())
+    db.commit()
+    return 'updated'
